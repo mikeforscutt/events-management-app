@@ -8,11 +8,13 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libsqlite3-dev \
-    default-mysql-client \
     && docker-php-ext-install pdo pdo_mysql pdo_sqlite
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
