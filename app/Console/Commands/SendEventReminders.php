@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Event;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class SendEventReminders extends Command
 {
@@ -27,6 +28,7 @@ class SendEventReminders extends Command
      */
     public function handle()
     {
+        Log::info('SendEventReminders command is being executed');
         $events = Event::with('attendees.user')
             ->whereBetween('start_time', [now(), now()->addDay()])
             ->get();

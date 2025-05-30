@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
+RUN ln -snf /usr/share/zoneinfo/Europe/London /etc/localtime && echo "Europe/London" > /etc/timezone
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
