@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Event;
+use App\Notifications\EventReminderNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 
 class SendEventReminders extends Command
 {
@@ -28,11 +28,10 @@ class SendEventReminders extends Command
      */
     public function handle()
     {
-        Log::info('SendEventReminders command is being executed');
         $events = Event::with('attendees.user')
             ->whereBetween('start_time', [now(), now()->addDay()])
             ->get();
-        
+
         $eventCount = $events->count();
         $eventLabel = Str::plural('event', $eventCount);
 
@@ -40,10 +39,14 @@ class SendEventReminders extends Command
 
         $events->each(
             fn($event) => $event->attendees->each(
-                fn($attendee) => $this->info("Notifying the user {$attendee->user->name} about the event {$event->name}")
+                fn($attendee) => $attendee->user->notify(
+                    new EventReminderNotification(
+                        $event
+                    )
+                )
             )
         );
 
-        $this->info('Reminder notification sent successfully!');
+        $this->info('Reminder notifications sent successfully!');
     }
 }
